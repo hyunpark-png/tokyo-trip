@@ -1,0 +1,474 @@
+<title>우리 가족 도쿄 4일</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@500;700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: 역 안내판처럼 — 상단 고정 탭(일자) + 세로 노선도형 타임라인. 폰 한 손 조작 기준. */
+:root{
+  --bg:#f4f6f3; --surface:#ffffff; --ink:#18201b; --muted:#5d6b62; --line:#d9e0da;
+  --accent:#3f7a12; --accent-soft:#e6f1da; --warn:#a14a00; --warn-soft:#fdf0e1; --now:#c2185b;
+  --f-display:"Gothic A1","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  /* 노선 색 (데이터) */
+  --jy:#80c241; --ks:#1e50a2; --si:#f39800; --e:#cf3366; --g:#f39700; --in:#8a3fa0; --oh:#1a8bd0; --jc:#f15a22; --walk:#7b8a80; --bus:#d07a00; --taxi:#d4a400;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111613; --surface:#1a211c; --ink:#e7ede8; --muted:#9aa89f; --line:#2d3830;
+  --accent:#9fd36a; --accent-soft:#233420; --warn:#ffb36b; --warn-soft:#3a2a18; --now:#ff6fa5; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111613; --surface:#1a211c; --ink:#e7ede8; --muted:#9aa89f; --line:#2d3830;
+  --accent:#9fd36a; --accent-soft:#233420; --warn:#ffb36b; --warn-soft:#3a2a18; --now:#ff6fa5; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%}
+a{color:var(--accent)}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:0 64px}
+header.top{padding-block:20px 12px;display:grid;gap:10px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,7vw,36px);line-height:1.15;margin:0;text-wrap:balance}
+.flights{display:flex;flex-wrap:wrap;gap:8px}
+.flight{flex:1 1 220px;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:2px}
+.flight b{font-family:var(--f-mono);font-size:13px}
+.flight span{font-size:13px;color:var(--muted)}
+.nowbar{display:none;background:var(--surface);border:1.5px solid var(--now);border-radius:10px;padding:10px 12px;gap:4px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%}
+.nowbar.on{display:grid}
+.nowbar .k{font-family:var(--f-mono);font-size:11px;color:var(--now);letter-spacing:.08em}
+.nowbar strong{font-size:15px}
+.dday{font-size:13px;color:var(--muted)}
+
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:-16px;padding:8px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 13px/1 var(--f-body);padding:9px 12px;border-radius:999px;cursor:pointer;display:flex;gap:6px;align-items:center}
+.tab small{font-family:var(--f-mono);font-weight:500;font-size:11px;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab[aria-selected="true"] small{color:var(--bg);opacity:.75}
+.tab:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+section.panel{padding-top:18px;display:grid;gap:16px}
+.dayhead{display:grid;gap:6px}
+.dayhead h2{font-family:var(--f-display);font-weight:800;font-size:24px;margin:0;line-height:1.2;text-wrap:balance}
+.dayhead p{margin:0;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:3px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.chip.w{background:var(--warn-soft);color:var(--warn)}
+
+/* 타임라인 = 노선도 */
+ol.tl{list-style:none;margin:0;padding:0;position:relative}
+ol.tl::before{content:"";position:absolute;left:51px;top:10px;bottom:10px;width:4px;border-radius:2px;background:var(--line)}
+.stop{display:grid;grid-template-columns:44px 18px minmax(0,1fr);column-gap:8px;padding-block:6px}
+.stop .t{font-family:var(--f-mono);font-size:13px;font-weight:700;padding-top:12px;text-align:right;font-variant-numeric:tabular-nums}
+.stop .dot{width:18px;height:18px;border-radius:50%;background:var(--surface);border:4px solid var(--ink);margin-top:13px;position:relative;z-index:1}
+.stop.move .dot{border-color:var(--muted);width:14px;height:14px;margin:15px 2px 0;border-width:3px}
+.stop.eat .dot{border-color:var(--warn)}
+.stop.see .dot{border-color:var(--accent)}
+.stop.is-now .dot{border-color:var(--now);box-shadow:0 0 0 4px color-mix(in srgb,var(--now) 25%,transparent)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px;min-width:0}
+.stop.move .card{background:transparent;border-style:dashed}
+.stop.is-now .card{border-color:var(--now);border-width:1.5px}
+.card h3{margin:0;font-size:16px;line-height:1.35;font-weight:600;display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+.badge-now{font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;color:#fff;background:var(--now);padding:2px 6px;border-radius:4px}
+.card .sub{font-size:13px;color:var(--muted);margin-top:-4px}
+.card ul{margin:0;padding-left:18px;display:grid;gap:3px}
+.card li{font-size:14px}
+.route{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.leg{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:start;font-size:14px}
+.ln{font:700 11px/1 var(--f-mono);color:#fff;padding:5px 6px;border-radius:5px;min-width:44px;text-align:center;margin-top:1px}
+.ln.walk{background:var(--walk)}.ln.jy{background:var(--jy);color:#10240a}.ln.ks{background:var(--ks)}.ln.si{background:var(--si);color:#2a1700}.ln.e{background:var(--e)}.ln.g{background:var(--g);color:#2a1700}.ln.in{background:var(--in)}.ln.oh{background:var(--oh)}.ln.jc{background:var(--jc)}.ln.bus{background:var(--bus)}.ln.taxi{background:var(--taxi);color:#2a2000}
+.leg .st{font-family:var(--f-mono);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:0 4px;margin:0 2px;color:var(--muted)}
+.leg em{font-style:normal;color:var(--muted);font-size:13px}
+.note{font-size:13px;border-radius:8px;padding:8px 10px;background:var(--accent-soft);color:var(--ink)}
+.note.w{background:var(--warn-soft)}
+.note b{color:var(--accent)} .note.w b{color:var(--warn)}
+.acts{display:flex;flex-wrap:wrap;gap:6px}
+.btn{font:600 12px/1 var(--f-body);padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-decoration:none;cursor:pointer;display:inline-flex;gap:5px;align-items:center}
+.btn.jp{border-color:var(--ink)}
+
+/* 정보 패널 */
+.block{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:10px;min-width:0}
+.block h3{margin:0;font-family:var(--f-display);font-weight:800;font-size:18px}
+.block h4{margin:4px 0 0;font-size:15px}
+.block p{margin:0}
+.block ol,.block ul{margin:0;padding-left:20px;display:grid;gap:5px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:12px;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.verdict{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;font-size:14px}
+.pill{font:700 11px/1 var(--f-mono);padding:5px 7px;border-radius:5px;white-space:nowrap;align-self:start}
+.pill.y{background:var(--accent-soft);color:var(--accent)}.pill.n{background:var(--warn-soft);color:var(--warn)}
+.check{display:grid;gap:2px}
+.check label{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;cursor:pointer}
+.check label:last-child{border-bottom:0}
+.check input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent)}
+.check input:checked + span{color:var(--muted);text-decoration:line-through}
+.foot{font-size:12px;color:var(--muted)}
+
+/* 택시 카드 */
+.jpcard{position:fixed;inset:0;z-index:20;background:var(--bg);display:grid;place-items:center;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.jpcard .in{display:grid;gap:18px;text-align:center;max-width:640px;width:100%}
+.jpcard .say{font-size:15px;color:var(--muted)}
+.jpcard .big{font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",var(--f-display);font-weight:800;font-size:clamp(28px,8vw,48px);line-height:1.35;word-break:keep-all;overflow-wrap:anywhere}
+.jpcard .addr{font-size:clamp(18px,5vw,26px);font-weight:600}
+@media (prefers-reduced-motion:no-preference){.stop.is-now .dot{animation:pulse 2s ease-in-out infinite}@keyframes pulse{50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--now) 10%,transparent)}}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">TYO · 2026.10.24 SAT — 10.27 TUE · 어른 2 · 어린이 1 (10세)</div>
+    <h1>우리 가족 도쿄 4일</h1>
+    <div class="flights">
+      <div class="flight"><b>7C1103 · 10/24(토)</b><span>인천 T1 10:25 → 나리타 <strong>T3</strong> 12:55</span></div>
+      <div class="flight"><b>7C1104 · 10/27(화)</b><span>나리타 <strong>T3</strong> 14:00 → 인천 T1 17:05</span></div>
+    </div>
+    <button class="nowbar" id="nowbar" type="button"><span class="k" id="nowk">지금</span><strong id="nowt"></strong><span class="dday" id="nown"></span></button>
+    <div class="dday" id="dday"></div>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <main id="main"></main>
+</div>
+
+<div class="jpcard" id="jpcard" hidden role="dialog" aria-modal="true" aria-label="택시 기사님께 보여주기">
+  <div class="in">
+    <div class="say">기사님께 화면을 보여주세요 · 運転手さんへ</div>
+    <div class="big" id="jpbig"></div>
+    <div class="addr" id="jpaddr"></div>
+    <div class="say">ここまでお願いします。</div>
+    <button class="btn" id="jpclose" type="button" style="justify-self:center;padding:12px 18px;font-size:14px">닫기</button>
+  </div>
+</div>
+
+<script>
+const HOTEL = {jp:"da Haus Ikebukuro", addr:"東京都豊島区池袋2丁目15-3"};
+const M = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+const DIR = (a,b,mode) => "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(a)+"&destination="+encodeURIComponent(b)+"&travelmode="+(mode||"transit");
+
+/* ---------- 일정 데이터 ---------- */
+const DAYS = [
+{ id:"d1", date:"2026-10-24", tab:"1일", dow:"토", title:"도착 · 교통카드 · 포켓몬센터",
+  lead:"공항에서 아이 교통카드부터 만들고, 숙소 짐 풀고, 저녁엔 걸어서 포켓몬센터.",
+  chips:[["이동 많음"],["아이 여권 꼭 손에", "w"]],
+  stops:[
+  {t:"12:55", type:"move", title:"나리타 T3 도착 → 입국·짐 찾기", sub:"보통 40~60분",
+   body:["Visit Japan Web QR(입국·세관) 미리 화면에 띄워두기","짐 찾고 나와서 표지판 <b>“Terminal 2 / Railway(鉄道)”</b> 따라가기"]},
+  {t:"13:50", type:"move", title:"T3 → T2 지하 ‘空港第2ビル駅’까지 걷기", sub:"약 15분 · 무료 셔틀버스도 있음",
+   route:[["walk","T3 도착층에서 바닥 <b>육상 트랙 모양 통로</b>(파란 선 = T2 방향)를 따라 T2 본관으로"],["walk","T2 도착 후 <b>B1층 ‘空港第2ビル駅(Airport Terminal 2 Station)’</b>으로 내려가기. JR과 京成(케이세이) 개찰구가 나란히 있음"]],
+   note:["유모차·짐 많으면 T3 버스정류장에서 T2행 무료 셔틀(약 10분)",""]},
+  {t:"14:00", type:"see", title:"① 아이 Welcome Suica 발급 (JR 창구)", sub:"JR EAST Travel Service Center · 空港第2ビル駅 B1",
+   body:["JR 개찰구 옆 <b>‘JR EAST Travel Service Center’</b> 창구로 가서 “Welcome Suica, child” 요청","<b>아이 여권 필수</b> (어린이용은 창구에서 여권 확인 후 발급)","충전 금액 추천: 아이 ¥1,500 / 어른 각 ¥3,000 (보증금 없음, 28일 유효)","어른 2장은 같은 층 <b>Welcome Suica 자동발매기</b>에서 사도 됨 (현금 준비)","어린이 카드는 찍기만 하면 <b>자동으로 반값</b>이 빠짐. 반드시 아이 본인만 사용"],
+   note:["<b>충전 잔액은 환불이 안 됩니다.</b> 마지막 날 편의점·자판기에서 남은 돈을 쓰는 게 요령.","w"]},
+  {t:"14:20", type:"see", title:"② 스카이라이너 표 구매 (케이세이 창구)", sub:"Skyliner Ticket Counter · 같은 B1층",
+   body:["창구에서 <b>日暮里(닛포리)까지 어른 2 + 어린이 1</b>. 정가 어른 ¥2,580 / 어린이 약 ¥1,290","미리 온라인(Skyliner e-ticket)으로 사면 어른 ¥2,310 / 어린이 ¥1,150 → 창구에서 QR 교환","전석 지정석이라 표에 열차 시각·좌석이 찍혀 나옴. 20~40분 간격"],
+   note:["스카이라이너는 <b>표를 개찰구에 넣고</b> 탑니다 (Suica 찍지 않기).",""]},
+  {t:"14:40", type:"move", title:"스카이라이너 → 닛포리 → 이케부쿠로", sub:"총 약 1시간",
+   route:[["ks","<b>京成スカイライナー</b> 空港第2ビル → <span class='st'>KS02</span> 日暮里 <em>약 36~40분</em>"],["walk","닛포리 하차 후 <b>‘JR線 のりかえ(JR 환승)’</b> 표지 → 케이세이→JR 환승 개찰구에서 스카이라이너 표를 넣고 Suica를 함께 터치 (헷갈리면 옆 유인창구)"],["jy","<b>JR 山手線(야마노테선)</b> ‘池袋・新宿方面’ 승강장 <span class='st'>JY07</span> 日暮里 → <span class='st'>JY13</span> 池袋 <em>약 15분 · 7정거장</em>"],["walk","이케부쿠로역에서 노란 표지 <b>‘北口(North Exit)’</b>로 나가서 숙소까지 도보 약 6분"]],
+   map:DIR("Narita Airport Terminal 2 Station", HOTEL.addr)},
+  {t:"16:00", type:"stay", title:"숙소 체크인 · da Haus Ikebukuro", sub:"池袋2丁目15-3 · 셀프 체크인(키패드)",
+   body:["체크인 시각·현관 비밀번호는 호스트 메시지로 미리 확인","짐 풀고 30분 휴식. 아이 간식 타임"], map:M("da Haus Ikebukuro 東京都豊島区池袋2-15-3"), jp:"hotel"},
+  {t:"17:00", type:"move", title:"숙소 → 선샤인시티", sub:"도보 약 20분 · 피곤하면 택시 약 ¥1,000~1,300",
+   route:[["walk","숙소 → JR 池袋역 <b>北口</b> → 역 북쪽 지하통로(北通路)로 동쪽 출구 쪽 → 지상으로 나와 <b>サンシャイン60通り</b>를 따라 직진"],["taxi","첫날 피곤하면 택시가 제일 편함 (3명이면 지하철보다 훨씬 편하고 차액도 작음)"]],
+   map:DIR(HOTEL.addr,"サンシャインシティ アルパ","walking"), jp:"sunshine"},
+  {t:"17:20", type:"see", title:"포켓몬센터 메가토쿄 + 피카츄 스위츠", sub:"선샤인시티 専門店街アルパ 2F · 10:00~20:00",
+   body:["국내 최대 규모 포켓몬센터. 바로 옆에 <b>피카츄 스위츠 by 포켓몬카페</b>(디저트 테이크아웃)","생일 달이면 계산대에서 생일 카드 받을 수 있음"],
+   note:["<b>입장 제한 확인 필수.</b> 이 매장은 2026년 8/24 재개장 이후 한동안 입장 인원을 제한한다고 공지했습니다. 전날 공식 매장 페이지·공식 X(@pokemoncenterPR)에서 정리권 여부를 확인하세요. 저녁에 못 들어가면 2일차 아침 10시 오픈런으로 대체.","w"],
+   map:M("ポケモンセンターメガトウキョー サンシャインシティ"), link:["매장 공지 보기","https://shop.pokemon.co.jp/ja/shop/pokemoncenter-megatokyo/"]},
+  {t:"18:30", type:"eat", title:"저녁 · 선샤인시티 안 식당가", sub:"아이 동반 무난 · 이동 0분",
+   body:["アルパ / 専門店街 식당가(B1~3F)에서 돈카츠·우동·오므라이스 등 패밀리형 식당 선택","야키토리를 원하면 숙소 가는 길 <b>とり鉄 池袋西口店</b>(체인, 테이블석)도 가능 — 다만 아이와 제대로 즐기는 야키토리는 2일차 기치조지 ‘いせや’에 배치"]},
+  {t:"19:40", type:"move", title:"귀가길 장보기 → 숙소", sub:"내일 아침거리",
+   body:["숙소 근처 <b>ローソン 池袋二丁目店</b>(24시간) 또는 역 지하 <b>東武百貨店 B1 식품관</b>(빵·도시락, 폐점 전 할인)","추천: 빵·요거트·우유·바나나·삼각김밥·세븐일레븐 타마고산도"]}
+  ]},
+
+{ id:"d2", date:"2026-10-25", tab:"2일", dow:"일", title:"시모키타자와 → 기치조지 감성 산책",
+  lead:"오전엔 시모키타 골목과 편집샵, 오후엔 이노카시라 공원 오리배, 저녁은 아이와 함께 가는 야키토리 ‘いせや’.",
+  chips:[["도쿄 감성 거리"],["야키토리 저녁"],["많이 걷는 날", "w"]],
+  stops:[
+  {t:"08:30", type:"eat", title:"아침 · 숙소 또는 근처 카페", sub:"",
+   body:["숙소에서 어제 산 빵·요거트","카페로 나간다면: <b>Global Ring Cafe</b>(池袋西口公園 안, 07:00~) 또는 <b>イタリアン・トマト カフェジュニア 池袋西口店</b>(모닝 07:15~10:00)"]},
+  {t:"10:00", type:"move", title:"이케부쿠로 → 신주쿠 → 시모키타자와", sub:"약 30분",
+   route:[["jy","<b>JR 山手線</b> ‘新宿・渋谷方面’ <span class='st'>JY13</span> 池袋 → <span class='st'>JY17</span> 新宿 <em>약 8분</em>"],["walk","신주쿠역 <b>‘小田急線(오다큐선)’</b> 표지 따라 서쪽 오다큐 개찰구로 (Suica 그대로)"],["oh","<b>小田急線</b> 急行/快速急行 <span class='st'>OH01</span> 新宿 → <span class='st'>OH07</span> 下北沢 <em>약 7~8분</em>"]],
+   map:DIR(HOTEL.addr,"下北沢駅")},
+  {t:"10:45", type:"see", title:"시모키타 ‘下北線路街’ 산책", sub:"옛 선로 위에 생긴 산책 거리",
+   body:["<b>reload</b>(東口 쪽 도보 4분): 흰 2층 건물이 이어진 개인 상점가. 편집샵·커피·차 가게","<b>下北線路街 空き地</b>: 토관 광장, 아이가 뛰어놀기 좋음","역 남서쪽 골목: 빈티지 옷가게, 레코드, 잡화"], map:M("reload 下北沢")},
+  {t:"11:40", type:"eat", title:"점심 · Rojiura Curry SAMURAI. 下北沢店", sub:"홋카이도식 수프카레 · 11:30~15:30",
+   body:["채소 20가지 수프카레. <b>맵기 0단계</b> 가능해서 아이도 OK","오픈 직후가 덜 붐빔. 줄이 길면 근처 다른 카레집 다수 (시모키타는 카레 동네)"], map:M("Rojiura Curry SAMURAI 下北沢店")},
+  {t:"12:50", type:"see", title:"BONUS TRACK + 도넛 디저트", sub:"下北沢駅 남서쪽 도보 약 5분",
+   body:["<b>BONUS TRACK</b>: 작은 서점·잡화·카페가 마당을 둘러싼 상점가","바로 옆 <b>洞洞(호라호라)</b> 도넛 테이크아웃"], map:M("BONUS TRACK 下北沢")},
+  {t:"14:10", type:"move", title:"시모키타자와 → 기치조지", sub:"게이오 이노카시라선 한 번에",
+   route:[["in","<b>京王井の頭線</b> ‘吉祥寺行’ 急行 <span class='st'>IN05</span> 下北沢 → <span class='st'>IN17</span> 吉祥寺 <em>약 17분 · 종점</em>"],["walk","기치조지역 <b>公園口(남쪽)</b>으로 나와 이노카시라 공원까지 5분"]]},
+  {t:"14:40", type:"see", title:"이노카시라 공원 · 오리배", sub:"井の頭恩賜公園 · 오후 빛이 예쁜 시간",
+   body:["연못 <b>백조 오리배(スワンボート)</b> 30분 단위 대여 — 아이가 가장 좋아할 코스","해가 16시 50분쯤 지니 보트는 일찍 타기","공원 안 작은 신사·다리 산책"], map:M("井の頭恩賜公園 ボート場")},
+  {t:"15:50", type:"see", title:"中道通り · 선로드 · 하모니카 골목", sub:"역 북쪽 · 잡화와 디저트 거리",
+   body:["<b>中道通り</b>: 동네 잡화점·편집샵이 이어진 골목. free design(북유럽 생활잡화), はらドーナッツ","<b>サンロード</b> 아케이드, 노포 골목 <b>ハーモニカ横丁</b>는 구경만","디저트: <b>woodberrys</b> 젤라또(역 도보 2분), 아테스웨이는 조금 멀어서 시간 남을 때만"], map:M("吉祥寺 中道通り")},
+  {t:"17:30", type:"eat", title:"저녁 · 야키토리 ‘いせや 公園店’", sub:"1928년 창업 · 공원 입구 · 12:00~22:00 · <b>월요일 휴무</b>",
+   body:["기치조지를 대표하는 서민 야키토리. 가족 단위 손님도 흔한 분위기","아이 메뉴: 츠쿠네(닭완자)·네기마·시우마이, 어른은 맥주 한 잔","대기 줄이 있으면 가게 앞 <b>테이크아웃 창구</b>에서 꼬치를 사서 공원 벤치도 방법"],
+   note:["현금만 받던 가게라 <b>엔화 현금</b> 준비. 이 날짜(일요일)에 넣은 이유는 월요일 정기휴무 때문입니다.","w"], map:M("いせや 公園店 吉祥寺")},
+  {t:"19:00", type:"move", title:"기치조지 → 숙소", sub:"약 35~40분",
+   route:[["jc","<b>JR 中央線 快速</b> ‘新宿・東京方面’ 吉祥寺 → <span class='st'>JC05</span> 新宿 <em>약 15분</em>"],["jy","<b>JR 山手線</b> ‘池袋方面’ 新宿 → 池袋 <em>약 8분</em> → 北口 도보 6분"]],
+   map:DIR("吉祥寺駅",HOTEL.addr)},
+  {t:"20:00", type:"stay", title:"숙소 · 내일 아침거리 준비", sub:"내일은 07:50 출발",
+   body:["편의점에서 <b>내일 아침 + 물</b> 미리 사두기 (해리포터 날은 아침이 바쁨)","해리포터 입장 QR 티켓 휴대폰에 저장·스크린샷"]}
+  ]},
+
+{ id:"d3", date:"2026-10-26", tab:"3일", dow:"월", title:"해리포터 스튜디오 → 아사쿠사",
+  lead:"오전 9시 해리포터. 오후엔 도에이 오에도선 한 번으로 구라마에·아사쿠사까지 이어 붙입니다.",
+  chips:[["09:00 예약"],["아사쿠사 포함"],["긴 하루", "w"]],
+  stops:[
+  {t:"07:30", type:"eat", title:"아침 · 숙소에서 간단히", sub:"어젯밤 사둔 빵·삼각김밥",
+   body:["가방: 해리포터 QR, 보조배터리, 얇은 겉옷(스튜디오 실내 냉방)"]},
+  {t:"07:50", type:"move", title:"숙소 → 세이부 이케부쿠로선 → 豊島園", sub:"약 30분 · 입장 20분 전 도착 목표",
+   route:[["walk","숙소 → JR 池袋역 <b>北口</b> → 지하 북쪽 통로에서 <b>‘西武池袋線 北改札’</b> 표지로 (Suica 그대로 사용)"],["si","<b>西武池袋線</b> 전광판에서 <b>‘豊島園’ 직통</b> 열차를 찾아 탑승 <em>약 15~20분</em>. 직통이 없으면 ‘練馬’에서 내려 맞은편 豊島線으로 1정거장"],["walk","豊島園역에서 스튜디오까지 도보 2분"]],
+   map:DIR(HOTEL.addr,"ワーナー ブラザース スタジオツアー東京")},
+  {t:"09:00", type:"see", title:"워너브라더스 스튜디오 투어 도쿄", sub:"The Making of Harry Potter · 관람 약 3.5~4시간",
+   body:["대연회장 → 9와 3/4 승강장·호그와트 급행 → 다이애건 앨리 → 마법부(도쿄 단독 세트)","<b>버터비어</b>는 중간 백로트 카페에서","출구 쪽 스튜디오 숍은 오래 걸리니 시간 정하고 들어가기"],
+   map:M("ワーナー ブラザース スタジオツアー東京 メイキング・オブ・ハリー・ポッター"), jp:"hp"},
+  {t:"12:30", type:"eat", title:"점심 · 스튜디오 안 푸드홀", sub:"이동 없이 해결",
+   body:["관람 후반 푸드홀/카페에서 점심 → 바로 이동해야 아사쿠사 시간이 남음"]},
+  {t:"13:30", type:"move", title:"豊島園 → 구라마에 (오에도선 한 줄)", sub:"약 45~55분 · 이게 아사쿠사를 넣을 수 있는 이유",
+   route:[["e","<b>都営大江戸線</b> <span class='st'>E36</span> 豊島園 → <span class='st'>E11</span> 蔵前. 갈아타지 않는 직통 열차가 있고, 都庁前(E28)에서 갈아타면 더 빠른 경우도 있음 → <b>구글맵 실시간 경로대로</b>"],["walk","大江戸線 蔵前역 출구로 나와 ダンデライオン・チョコレート까지 약 7분"]],
+   note:["세이부선 표가 아니라 Suica만 있으면 됩니다. 지하철 1일권(도쿄 서브웨이 티켓)은 이번 동선에선 이득이 거의 없어요.",""], map:DIR("豊島園駅","ダンデライオン・チョコレート ファクトリー&カフェ蔵前")},
+  {t:"14:30", type:"eat", title:"구라마에 · 초콜릿 공장 카페 휴식", sub:"Dandelion Chocolate 蔵前 · 10:00~20:00",
+   body:["창고를 고친 카페. 카카오 볶는 공장이 보임. 핫초코·브라우니로 당 충전","구라마에는 ‘도쿄의 브루클린’ 같은 작은 공방 동네 (문구점 カキモリ는 <b>월요일 휴무</b>라 제외)"], map:M("ダンデライオン・チョコレート ファクトリー&カフェ蔵前")},
+  {t:"15:20", type:"move", title:"구라마에 → 가미나리몬 걷기", sub:"江戸通り 따라 북쪽 약 15분 · 스미다강 옆"},
+  {t:"15:40", type:"see", title:"아사쿠사 · 가미나리몬 → 나카미세 → 센소지", sub:"해 질 무렵(16:50) 조명 켜지는 시간",
+   body:["<b>雷門</b> 큰 등 앞 가족사진","<b>仲見世通り</b> 간식: 닌교야키, 아게만주, 멜론빵 (가게는 17~18시 전후로 닫음)","<b>浅草寺</b> 본당, 오미쿠지(운세 뽑기 ¥100) — 아이가 좋아함","해 지면 본당·오층탑 라이트업"], map:M("雷門 浅草"), jp:"asakusa"},
+  {t:"17:30", type:"eat", title:"저녁 · 風流お好み焼 染太郎", sub:"西浅草 · 다다미 방에서 직접 굽는 노포 오코노미야키 · 화·수 휴무",
+   body:["센소지에서 서쪽으로 도보 약 10분 (田原町역 근처)","직원이 굽는 법 알려줌. 아이가 직접 뒤집는 재미","대안: 浅草 つる次郎(浅草1丁目, 수 휴무) 오코노미야키·몬자"], map:M("風流お好み焼 染太郎")},
+  {t:"19:00", type:"move", title:"아사쿠사 → 숙소", sub:"약 35~40분",
+   route:[["g","<b>東京メトロ 銀座線</b> <span class='st'>G18</span> 田原町 → <span class='st'>G16</span> 上野 <em>약 4분</em>"],["walk","上野역에서 <b>‘JR線’</b> 표지 → 개찰구 통과 (Suica)"],["jy","<b>JR 山手線</b> ‘池袋・新宿方面’ <span class='st'>JY05</span> 上野 → <span class='st'>JY13</span> 池袋 <em>약 18분</em> → 北口"]],
+   note:["택시 판단: 아사쿠사→숙소 택시는 약 ¥6,000 이상. 전철은 3명 합쳐 약 ¥800 안팎 → <b>전철 추천</b>. 아이가 잠들면 그때만 택시.",""], map:DIR("田原町駅",HOTEL.addr)},
+  {t:"20:00", type:"stay", title:"숙소 · 짐 싸기", sub:"내일 09:15 출발",
+   body:["Suica 잔액 확인 → 내일 공항·편의점에서 쓸 만큼만 남기기"]}
+  ]},
+
+{ id:"d4", date:"2026-10-27", tab:"4일", dow:"화", title:"출국",
+  lead:"14:00 출발이라 오전은 이동에 집중. 11:30까지 나리타 T3 도착이 목표.",
+  chips:[["T3 출발"],["11:30 공항 도착", "w"]],
+  stops:[
+  {t:"07:30", type:"eat", title:"아침 · 숙소 또는 서쪽 출구 카페", sub:"",
+   body:["<b>イタリアン・トマト カフェジュニア 池袋西口店</b> 모닝 07:15~10:00","제주항공 온라인 체크인 미리 하기"]},
+  {t:"09:15", type:"move", title:"숙소 체크아웃 → 이케부쿠로 → 닛포리", sub:"약 25분",
+   route:[["walk","숙소 → JR 池袋역 <b>北口</b> (캐리어 끌고 6~8분)"],["jy","<b>JR 山手線</b> ‘大塚・上野方面’ <span class='st'>JY13</span> 池袋 → <span class='st'>JY07</span> 日暮里 <em>약 15분</em>"],["walk","닛포리역 <b>‘京成線 のりかえ’</b> 환승 개찰구 옆 창구에서 스카이라이너 표 구매(또는 e-ticket 교환). 스카이라이너 표 + Suica를 함께 사용해 통과"]]},
+  {t:"10:00", type:"move", title:"스카이라이너 → 空港第2ビル → T3", sub:"약 40분 + 도보 15분",
+   route:[["ks","<b>京成スカイライナー</b> <span class='st'>KS02</span> 日暮里 → 空港第2ビル <em>약 36~39분</em> (成田空港 종점 전 역에서 하차!)"],["walk","B1에서 올라와 T2 → <b>T3 방향 통로</b>(트랙 모양 바닥) 약 15분 / 무료 셔틀"]],
+   note:["<b>‘空港第2ビル’에서 내리기.</b> 다음 역 ‘成田空港’은 제1터미널입니다.","w"], map:DIR("日暮里駅","Narita Airport Terminal 3")},
+  {t:"11:30", type:"see", title:"나리타 T3 · 제주항공 체크인", sub:"카운터 마감은 보통 출발 1시간 전 — 꼭 미리",
+   body:["수하물 부치기 → T3 푸드코트에서 점심","<b>Welcome Suica 남은 잔액</b>: 공항 편의점·자판기에서 사용 (환불 불가)","보안검색·출국심사 대기가 길 수 있어 12:45에는 들어가기"]},
+  {t:"14:00", type:"move", title:"7C1104 출발 → 인천 T1 17:05", sub:"수고하셨습니다"}
+  ]}
+];
+
+/* ---------- 정보 패널 ---------- */
+const JP = {
+  hotel:{jp:"da Haus Ikebukuro", addr:HOTEL.addr},
+  sunshine:{jp:"サンシャインシティ（アルパ）", addr:"東京都豊島区東池袋3-1-2"},
+  hp:{jp:"ワーナー ブラザース スタジオツアー東京", addr:"東京都練馬区春日町1-1-7"},
+  asakusa:{jp:"雷門（浅草）", addr:"東京都台東区浅草1-2-3"}
+};
+
+const PANELS = {
+prep:`
+<div class="dayhead"><h2>출발 전 준비</h2><p>체크하면 이 휴대폰에 저장됩니다.</p></div>
+<div class="block"><h3>체크리스트</h3><div class="check" id="checks"></div></div>
+<div class="block">
+ <h3>꼭 확인할 3가지</h3>
+ <ol>
+  <li><b>포켓몬센터 메가토쿄 입장 방식</b> — 2026년 3월 사건으로 휴업 후 8/24 재개장, “당분간 입장 제한” 공지. 여행 전날 <a href="https://shop.pokemon.co.jp/ja/shop/pokemoncenter-megatokyo/" target="_blank" rel="noopener">공식 매장 페이지</a> 확인.</li>
+  <li><b>숙소 체크인 시각·비밀번호</b> — 셀프 체크인. 호스트 메시지 캡처.</li>
+  <li><b>스카이라이너 할인표</b> — 출발 전 Skyliner e-ticket으로 사면 어른 ¥270, 아이 ¥140씩 절약. 왕복표는 공항역에서만 교환 가능하니 <b>편도 2번</b> 사는 게 편함.</li>
+ </ol>
+</div>
+<div class="block">
+ <h3>이 페이지를 폰에서 쓰는 법</h3>
+ <ul>
+  <li>이미 인터넷에 올라간 페이지라 <b>별도 서버가 필요 없습니다.</b> 링크를 가족 카톡에 공유하세요.</li>
+  <li>아이폰 Safari: 공유 버튼 → <b>‘홈 화면에 추가’</b> / 안드로이드 Chrome: ⋮ → ‘홈 화면에 추가’.</li>
+  <li>여행 날짜가 되면 자동으로 그날 탭이 열리고, 지금 시간에 해당하는 일정에 <b style="color:var(--now)">지금</b> 표시가 뜹니다.</li>
+  <li>인터넷이 필요하니 eSIM/로밍 준비. 지도 버튼은 구글맵을 엽니다.</li>
+ </ul>
+</div>`,
+
+move:`
+<div class="dayhead"><h2>교통 총정리</h2><p>결론: 세 명 모두 <b>Welcome Suica</b>로 찍고 다니기. 패스권은 사지 않아도 됩니다.</p></div>
+<div class="block">
+ <h3>아이 교통카드 (Welcome Suica 어린이용)</h3>
+ <ol>
+  <li><b>어디서</b>: 나리타 <b>空港第2ビル駅 (T2 지하 B1)</b>의 <b>JR EAST Travel Service Center</b>. T3에서 내리므로 T2까지 걸어와서 바로 있는 곳.</li>
+  <li><b>준비물</b>: 아이 여권 (6~11세 어린이용은 여권으로 나이 확인), 엔화 현금.</li>
+  <li><b>말하기</b>: “Welcome Suica, one child, please.” 충전액 ¥1,500 정도.</li>
+  <li><b>쓰는 법</b>: 개찰구 IC 마크에 터치. 어린이 운임(어른의 약 절반)이 자동 계산. JR·지하철·세이부·게이오·오다큐·버스·편의점 모두 사용.</li>
+  <li><b>충전</b>: 역 발매기의 ‘チャージ’ 버튼 → 카드 넣고 현금. 잔액은 개찰구 화면에 표시.</li>
+  <li><b>주의</b>: 28일 유효, 보증금 없음, <b>잔액 환불 불가</b>. 아이 카드는 아이만 사용.</li>
+ </ol>
+ <div class="note">어른은 같은 층 Welcome Suica 자동발매기(현금)에서. 아이폰 지갑의 Suica도 되지만 한국 카드 충전이 막히는 경우가 있어 이번엔 3장 모두 실물 카드를 추천합니다.</div>
+</div>
+<div class="block">
+ <h3>왜 지하철 패스(Tokyo Subway Ticket)를 안 사나</h3>
+ <p>이 일정의 주요 이동은 JR 야마노테선, 세이부선(해리포터), 게이오·오다큐선(시모키타·기치조지)입니다. 지하철 패스는 도쿄메트로·도에이만 되므로 3일차 오에도선·긴자선 정도만 해당돼서 본전이 안 나옵니다.</p>
+</div>
+<div class="block">
+ <h3>예상 교통비 (가족 3명 합계, 대략)</h3>
+ <div class="tbl"><table>
+  <thead><tr><th>날짜</th><th>구간</th><th>가족 합계</th></tr></thead>
+  <tbody>
+   <tr><td>1일</td><td>스카이라이너(할인표) + JR 닛포리→이케부쿠로</td><td class="n">≈ ¥6,200</td></tr>
+   <tr><td>2일</td><td>JR·오다큐 → 게이오 → JR</td><td class="n">≈ ¥2,000</td></tr>
+   <tr><td>3일</td><td>세이부 → 오에도선 → 긴자선 → JR</td><td class="n">≈ ¥2,300</td></tr>
+   <tr><td>4일</td><td>JR 이케부쿠로→닛포리 + 스카이라이너</td><td class="n">≈ ¥6,200</td></tr>
+  </tbody></table></div>
+ <p class="foot">스카이라이너 할인가(어른 ¥2,310 / 아이 ¥1,150)는 케이세이 공식 기준. 나머지는 IC 요금 근사치이며 아이는 어른의 약 절반.</p>
+</div>
+<div class="block">
+ <h3>택시가 이득인 순간</h3>
+ <p>도쿄 택시는 첫 약 1km 기본요금 약 ¥500, 3~4km면 ¥1,300~1,800 정도. Uber·GO 앱으로 부르면 목적지 설명이 필요 없습니다.</p>
+ <div class="verdict">
+  <span class="pill y">택시 OK</span><span>1일차 숙소 ↔ 선샤인시티 (약 1.5km, ¥1,000~1,300). 피곤한 첫날 저녁 20분 걷기를 없애줌.</span>
+  <span class="pill y">택시 OK</span><span>비 오는 날 숙소 ↔ 이케부쿠로역 짧은 구간.</span>
+  <span class="pill n">전철</span><span>아사쿠사 → 숙소 (택시 ¥6,000+ vs 전철 ≈ ¥800).</span>
+  <span class="pill n">전철</span><span>해리포터 (세이부선 직통 15~20분, 아침 도로 정체).</span>
+  <span class="pill n">전철</span><span>공항 (택시는 ¥20,000 이상).</span>
+ </div>
+</div>
+<div class="block">
+ <h3>공항 이동 대안 · 리무진버스</h3>
+ <p>짐이 많거나 아이가 지쳤으면 <b>에어포트 리무진</b>이 나리타 T3 ↔ 이케부쿠로(호텔 메트로폴리탄, 숙소에서 도보 약 10분)를 갈아타지 않고 연결합니다. 어른 ¥3,200 / 어린이 ¥1,600 (가족 ¥8,000), 약 90~120분. 공항행은 <b>T3에 제일 먼저 정차</b>. 도로 정체 위험이 있어 기본안은 스카이라이너.</p>
+</div>
+<div class="block">
+ <h3>큰 역에서 길 찾는 요령</h3>
+ <ul>
+  <li>이케부쿠로는 <b>北口(북쪽 출구)</b>만 기억하면 숙소. 노란 출구 표지를 따라가세요.</li>
+  <li>승강장은 ‘노선 이름 + ○○方面(방면)’ 표지로 찾기. 예: 山手線 池袋・新宿方面.</li>
+  <li>각 일정의 <span class="st" style="font-family:var(--f-mono);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:0 4px">JY13</span> 같은 역 번호가 승강장·전광판에 그대로 적혀 있습니다.</li>
+ </ul>
+</div>`,
+
+food:`
+<div class="dayhead"><h2>식사 · 아침 해결법</h2><p>점심·저녁은 일정 안에 배치. 여기는 아침과 장보기.</p></div>
+<div class="block">
+ <h3>숙소 근처 장보기</h3>
+ <ul>
+  <li><b>ローソン 池袋二丁目店</b> — 24시간, 숙소와 같은 池袋2丁目. 삼각김밥·샌드위치·우유.</li>
+  <li><b>東武百貨店 B1 식품관</b> (이케부쿠로역 서쪽, 역과 연결) — 빵·도시락·과일. 폐점 1시간 전쯤 할인 스티커.</li>
+  <li><b>ライフ 池袋三丁目店</b> — 일반 슈퍼, 09:30~24:00, 역에서 약 800m. 과일·요거트를 싸게.</li>
+ </ul>
+ <h4>아이 아침 추천 조합</h4>
+ <p>세븐일레븐 타마고산도(계란샌드), 연어·참치마요 삼각김밥, 메이지 요거트, 바나나, 빵집 소금빵. 숙소 전자레인지가 있으면 컵수프.</p>
+</div>
+<div class="block">
+ <h3>나가서 먹는 아침 (서쪽 출구 쪽)</h3>
+ <div class="tbl"><table>
+  <thead><tr><th>가게</th><th>시간</th><th>메모</th></tr></thead>
+  <tbody>
+   <tr><td>Global Ring Cafe</td><td class="n">07:00~</td><td>池袋西口公園 안, 테라스. 2일차 추천</td></tr>
+   <tr><td>イタリアン・トマト カフェジュニア 池袋西口店</td><td class="n">07:15~10:00</td><td>모닝 세트, 4일차 추천</td></tr>
+   <tr><td>タカセ 池袋本店 (2F 喫茶)</td><td class="n">09:00~11:00</td><td>1920년 창업 빵집 겸 다방, 토스트 모닝. 동쪽 출구</td></tr>
+  </tbody></table></div>
+ <p class="foot">3일차(해리포터)는 07:50 출발이라 전날 사둔 걸로 숙소에서.</p>
+</div>
+<div class="block">
+ <h3>아이와 가는 야키토리</h3>
+ <ul>
+  <li><b>いせや 公園店 (기치조지)</b> — 2일차 저녁 배치. 노포지만 가족 손님 흔함, 테이크아웃 창구 있음. 월요일 휴무, 현금 준비.</li>
+  <li><b>とり鉄 池袋西口店</b> — 숙소 쪽 체인점, 테이블석. 1일차 저녁 대안.</li>
+ </ul>
+ <p class="foot">일본 이자카야는 이른 저녁(17~19시) 아이 동반이 일반적입니다. 흡연석 운영 여부는 가게마다 달라 입구에서 “禁煙席ありますか?(금연석 있나요?)” 물어보세요.</p>
+</div>
+<div class="block">
+ <h3>디저트·편집샵 메모</h3>
+ <ul>
+  <li>선샤인: 피카츄 스위츠</li>
+  <li>시모키타: reload 상점가, BONUS TRACK, 洞洞 도넛</li>
+  <li>기치조지: 中道通り 잡화, はらドーナッツ, woodberrys 젤라또</li>
+  <li>구라마에: Dandelion Chocolate</li>
+  <li>아사쿠사: 나카미세 닌교야키·멜론빵</li>
+ </ul>
+</div>`
+};
+
+const CHECKS = [
+ "여권 3개 (아이 여권은 공항 Suica 창구에서 필요)",
+ "Visit Japan Web 등록 · 입국 QR 캡처",
+ "해리포터 10/26 09:00 입장 QR 저장",
+ "스카이라이너 e-ticket (편도 ×2, 어른 2·아이 1)",
+ "엔화 현금 (Suica 충전·いせや용, 1인 ¥20,000 정도)",
+ "eSIM / 로밍",
+ "숙소 체크인 안내·비밀번호 캡처",
+ "제주항공 온라인 체크인 (출국 전날)",
+ "포켓몬센터 입장 방식 전날 확인",
+ "Uber 또는 GO 택시 앱 설치",
+ "보조배터리 · 얇은 겉옷 (10월 말 도쿄 약 13~20℃)"
+];
+
+/* ---------- 렌더 ---------- */
+const TABS = [{id:"prep",tab:"준비"},...DAYS.map(d=>({id:d.id,tab:d.tab,dow:d.dow,date:d.date})),{id:"move",tab:"교통"},{id:"food",tab:"식사"}];
+const $ = s => document.querySelector(s);
+const toMin = t => {const [h,m]=t.split(":").map(Number);return h*60+m};
+function jstNow(){const d=new Date(Date.now()+9*3600e3);return {date:d.toISOString().slice(0,10),min:d.getUTCHours()*60+d.getUTCMinutes(),ms:d.getTime()}}
+
+function renderTabs(active){
+  $("#tabs").innerHTML = TABS.map(t=>`<button class="tab" role="tab" id="tab-${t.id}" aria-selected="${t.id===active}" data-id="${t.id}">${t.tab}${t.dow?` <small>${t.date.slice(5).replace("-","/")} ${t.dow}</small>`:""}</button>`).join("");
+}
+function stopHTML(s,i,state){
+  const route = s.route?`<ul class="route">${s.route.map(([l,txt])=>`<li class="leg"><span class="ln ${l}">${({walk:"도보",jy:"JR",ks:"京成",si:"西武",e:"大江戸",g:"銀座",in:"京王",oh:"小田急",jc:"中央",bus:"버스",taxi:"택시"})[l]}</span><span>${txt}</span></li>`).join("")}</ul>`:"";
+  const body = s.body?`<ul>${s.body.map(b=>`<li>${b}</li>`).join("")}</ul>`:"";
+  const note = s.note?`<div class="note ${s.note[1]||""}">${s.note[0]}</div>`:"";
+  const acts = [];
+  if(s.map) acts.push(`<a class="btn" href="${s.map}" target="_blank" rel="noopener">구글맵</a>`);
+  if(s.link) acts.push(`<a class="btn" href="${s.link[1]}" target="_blank" rel="noopener">${s.link[0]}</a>`);
+  if(s.jp) acts.push(`<button class="btn jp" type="button" data-jp="${s.jp}">택시 기사님께 보여주기</button>`);
+  return `<li class="stop ${s.type} ${state}" id="stop-${i}"><div class="t">${s.t}</div><div class="dot"></div>
+   <div class="card"><h3>${state==="is-now"?'<span class="badge-now">지금</span>':''}${s.title}</h3>${s.sub?`<div class="sub">${s.sub}</div>`:""}${route}${body}${note}${acts.length?`<div class="acts">${acts.join("")}</div>`:""}</div></li>`;
+}
+function currentIdx(day){
+  const n=jstNow(); if(n.date!==day.date) return -1;
+  let idx=-1; day.stops.forEach((s,i)=>{if(toMin(s.t)<=n.min) idx=i}); return idx;
+}
+function render(id){
+  renderTabs(id);
+  try{localStorage.setItem("tyo-tab",id)}catch(e){}
+  const d = DAYS.find(x=>x.id===id);
+  if(!d){ $("#main").innerHTML=`<section class="panel" role="tabpanel">${PANELS[id]}</section>`; if(id==="prep") renderChecks(); return; }
+  const ci = currentIdx(d);
+  $("#main").innerHTML = `<section class="panel" role="tabpanel">
+   <div class="dayhead"><div class="eyebrow">DAY ${d.tab[0]} · ${d.date.replace(/-/g,".")} ${d.dow}</div><h2>${d.title}</h2><p>${d.lead}</p>
+   <div class="chips">${d.chips.map(c=>`<span class="chip ${c[1]||""}">${c[0]}</span>`).join("")}</div></div>
+   <ol class="tl">${d.stops.map((s,i)=>stopHTML(s,i,i===ci?"is-now":"")).join("")}</ol></section>`;
+}
+function renderChecks(){
+  let saved={}; try{saved=JSON.parse(localStorage.getItem("tyo-checks")||"{}")}catch(e){}
+  $("#checks").innerHTML = CHECKS.map((c,i)=>`<label for="ck${i}"><input type="checkbox" id="ck${i}" ${saved[i]?"checked":""}><span>${c}</span></label>`).join("");
+  $("#checks").addEventListener("change",e=>{const i=e.target.id.slice(2);saved[i]=e.target.checked;try{localStorage.setItem("tyo-checks",JSON.stringify(saved))}catch(err){}});
+}
+function updateNow(){
+  const n=jstNow(); const d=DAYS.find(x=>x.date===n.date);
+  const bar=$("#nowbar");
+  if(d){
+    const i=currentIdx(d); const s=i>=0?d.stops[i]:null; const nx=d.stops[i+1];
+    bar.classList.add("on"); bar.dataset.day=d.id;
+    $("#nowk").textContent=`지금 · DAY ${d.tab[0]}`;
+    $("#nowt").textContent= s? `${s.t} ${s.title}` : `오늘 첫 일정 ${d.stops[0].t} ${d.stops[0].title}`;
+    $("#nown").textContent= nx && s ? `다음 ${nx.t} · ${nx.title}` : "";
+    $("#dday").textContent="";
+  } else {
+    bar.classList.remove("on");
+    const start=Date.UTC(2026,9,24); const diff=Math.ceil((start-n.ms)/864e5);
+    $("#dday").textContent = diff>0 ? `출발까지 D-${diff}` : "";
+  }
+}
+
+/* events */
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(b){render(b.dataset.id);window.scrollTo({top:0})}});
+$("#nowbar").addEventListener("click",()=>{const id=$("#nowbar").dataset.day;render(id);const el=document.querySelector(".stop.is-now");if(el)el.scrollIntoView({block:"center"})});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-jp]");if(!b)return;const c=JP[b.dataset.jp];$("#jpbig").textContent=c.jp;$("#jpaddr").textContent=c.addr;$("#jpcard").hidden=false;});
+$("#jpclose").addEventListener("click",()=>{$("#jpcard").hidden=true});
+
+/* init: 여행 당일이면 그날 탭 */
+(function(){
+  const n=jstNow(); const today=DAYS.find(d=>d.date===n.date);
+  let start=today?today.id:null;
+  if(!start){try{start=localStorage.getItem("tyo-tab")}catch(e){}}
+  if(!start||!TABS.find(t=>t.id===start)) start="d1";
+  render(start); updateNow(); setInterval(()=>{updateNow(); const a=document.querySelector('.tab[aria-selected="true"]'); if(a && DAYS.find(d=>d.id===a.dataset.id)) {const y=scrollY;render(a.dataset.id);scrollTo(0,y)}},60000);
+})();
+</script>
